@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Message</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  .pixel-font {
+    font-family: 'Press Start 2P', cursive;
+  }
+
+  .screen {
+    background:
+      radial-gradient(circle, rgba(27, 103, 27, 0.371) 1px, transparent 1px),
+      #093c1a; /* Warna latar hijau gelap */
+    background-size: 4px 4px;
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+</head>
+<body class="bg-[#1a1a2e] min-h-screen flex items-center justify-center px-4 py-10">
+  <img src="img/bg.png" alt="" class="absolute w-full h-full object-cover z-0">
+  <div class="max-w-md w-full p-4 border-4 border-yellow-400 rounded-xl bg-[#0f172a] relative">
+    <div class="screen p-4 rounded-lg h-[400px] overflow-y-auto scrollbar-hidden text-green-400 pixel-font text-xs leading-relaxed" id="messageBox">
+      <h1 class="text-green-500 text-lg text-center mb-4">Message</h1>
+      <pre id="typedText" class="whitespace-pre-wrap text-sm"></pre>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-6">
+      <a href="gallery.html">
+        <button class="w-full bg-green-500 hover:bg-green-600 text-white text-base py-3 rounded pixel-font">SELANJUTNYA</button>
+      </a>
+      <a href="index.html">
+        <button class="w-full bg-red-500 hover:bg-red-600 text-white text-base py-3 rounded pixel-font">KEMBALI</button>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const messageText = `Hi 云母🎀,
+
+Today is your Happy Birthday right?
+
+Happy level up day!! Semoga wishlist kamu di tahun ini tercapai ya, dilancarkan semuanya...
+Semoga semesta senantiasa bersamamu, semoga jalanmu di masa depan dipermudah, semoga lancar terus sekolahnya, SEMANGATT!!!
+Jangan lupa jaga kesehatannya juga yaa, and happy happy terus!!!
+
+Makasih ya, walau cuma beberapa hari doang, kamu pernah jadi bagian dari cerita di hidupku. Walaupun singkat, tetap ada pelajaran dan kenangan yang aku simpan baik-baik. Sekarang kita udah punya jalan masing-masing, tapi aku tetap doain yang terbaik buat kamu.
+
+Jujur... sampai detik ini di hatiku masih ada rasa sama kamu. Sampai aku bela-belain belajar Mandarin 🐱
+(gak tau juga kenapa, tapi ya... kamu sebegitu berartinya waktu itu.)
+
+Semoga di usia baru ini kamu makin dewasa, makin kuat, dan dikelilingi orang-orang baik yang selalu support kamu.
+Semoga bahagia selalu ya.
+
+Selamat ulang tahun 🎂🎀
+Tetap jadi versi terbaik dari diri kamu!
+我爱你`;
+
+    const typedTextElement = document.getElementById("typedText");
+    let index = 0;
+
+    function typeWriter() {
+      if (index < messageText.length) {
+        typedTextElement.textContent += messageText.charAt(index);
+        index++;
+        setTimeout(typeWriter, 20); // kecepatan ketik (ms)
+      }
+    }
+
+    window.addEventListener("load", typeWriter);
+  </script>
+</body>
+</html>

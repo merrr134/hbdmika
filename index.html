@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Green LCD Birthday</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    .pixel-font {
+    font-family: 'Press Start 2P', cursive;
+  }
+
+  .screen {
+    background:
+      radial-gradient(circle, rgba(27, 103, 27, 0.371) 1px, transparent 1px),
+      #093c1a; /* Warna latar hijau gelap */
+    background-size: 4px 4px;
+    background-position: 0 0;
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+  }
+  </style>
+</head>
+<body class="bg-black min-h-screen flex items-center justify-center">
+      <img src="img/bg.png" alt="" class="absolute w-full h-full object-cover z-0">
+  <div class="bg-gray-200 w-[400px] h-[600px] rounded-[30px] p-4 shadow-xl relative">
+
+      
+    <!-- Header -->
+    <div class="flex justify-between text-[10px] text-gray-600 px-1 font-bold">
+      <span class="text-red-600">● POWER</span>
+      <span class="italic">By Amimir</span>
+    </div>
+
+    <!-- Screen -->
+    <div class="mt-1 relative rounded-lg overflow-hidden border-4 border-gray-800 screen">
+      <!-- Teks -->
+      <div class="relative z-10 p-6 text-center pixel-font text-green-300">
+        <h1 class="text-2xl leading-relaxed">Happy<br>Birthday!</h1>
+        <p class="text-yellow-300 text-sm mt-2">Press Start Button</p>
+      </div>
+    </div>
+
+    <p class="text-[10px] text-gray-600 mt-1 ml-1">DARI AMIR UNTUK MIKA</p>
+
+    <!-- Buttons Grid -->
+  <div class="grid grid-cols-2 gap-2 mt-4 mb-4">
+    <a href="message.html" class="bg-blue-500 pixel-font text-white text-base py-3 rounded shadow-[3px_3px_0_#1e3a8a] text-center block">MESSAGE</a>
+    <a href="gallery.html" class="bg-[#f987c5] pixel-font text-white text-base py-3 rounded shadow-[3px_3px_0_#7f1d1d] text-center block">GALLERY</a>
+    <a href="music.html" class="bg-purple-500 pixel-font text-white text-base py-3 rounded shadow-[3px_3px_0_#4c1d95] text-center block">MUSIC</a>
+    <a href="tetris.html" class="bg-green-500 pixel-font text-white text-base py-3 rounded shadow-[3px_3px_0_#065f46] text-center block">TETRIS</a>
+  </div>
+
+
+    <!-- Bagian bawah: D-pad dan A/B 4 tombol -->
+<div class="flex justify-between items-center mt-6 px-8">
+      <!-- D-pad: bulat besar seperti gambar -->
+      <div class="relative w-24 h-24 rounded-full bg-[#bcdffb] flex items-center justify-center  border-4 border-blue-300">
+        <div class="w-12 h-12 rounded-full bg-[#bcdffb] border-2 border-blue-300 shadow-inner"></div>
+      </div>
+    
+      <!-- A/B: 4 tombol bulat seperti joystick -->
+      <div class="relative w-24 h-24 rounded-full bg-[#bcdffb] border-4 border-blue-300">
+            <div class="absolute top-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#bcdffb] border-2 border-blue-300 shadow-md"></div>
+            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#bcdffb] border-2 border-blue-300 shadow-md"></div>
+            <div class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#bcdffb] border-2 border-blue-300 shadow-md"></div>
+            <div class="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#bcdffb] border-2 border-blue-300 shadow-md"></div>
+      </div>
+          
+          
+      
+    </div>
+    
+    <!-- Tombol SELECT dan START -->
+    <div class="flex justify-center gap-6 mt-8">
+      <button class="bg-gray-700 text-white text-[10px] px-3 py-1 rounded-full pixel-font shadow-md">SELECT</button>
+      <button class="bg-gray-700 text-white text-[10px] px-3 py-1 rounded-full pixel-font shadow-md">START</button>
+    </div>
+    
+
+    <!-- Speaker dots -->
+    <div class="absolute bottom-4 right-4 grid grid-cols-2 gap-1">
+      <div class="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+      <div class="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+      <div class="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+      <div class="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+    </div>
+  </div>
+</body>
+</html>

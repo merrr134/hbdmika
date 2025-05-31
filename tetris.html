@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tetris Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    .pixel-font {
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    /* Grid & cells */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(20, 1fr);
+      gap: 1px;
+      width: 200px;
+      height: 400px;
+      background-color: #1f2937;
+      border: 4px solid #4b5563;
+    }
+
+    .grid-cell {
+      background-color: #111827;
+      border: 1px solid #374151;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Popup overlay background */
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 49;
+      display: none;
+    }
+
+    /* Popup box */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 280px;
+      max-width: 90vw;
+      padding: 2rem;
+      border-radius: 16px;
+      border: 3px solid #facc15; /* kuning */
+      z-index: 50;
+      text-align: center;
+      color: #22c55e; /* hijau */
+      font-family: 'Press Start 2P', cursive;
+      user-select: none;
+      display: none;
+      background-color: #000000; /* hitam polos */
+    }
+
+    .popup p {
+      font-size: 0.8rem;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    /* Popup button */
+    .popup button {
+      margin-top: 1.5rem;
+      background-color: #22c55e; /* hijau */
+      color: #000;
+      padding: 0.75rem 2rem;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8rem;
+    }
+    .popup button:hover {
+      background-color: #16a34a;
+      color: #fff;
+    }
+  </style>
+</head>
+<body class="bg-[#1a1a2e] min-h-screen flex items-center justify-center px-4 py-10 relative">
+
+  <div class="relative z-10 max-w-md w-full p-4 border-4 border-yellow-400 rounded-xl bg-[#0f172a]">
+    <h1 class="text-center text-green-400 text-xl pixel-font mb-4">Tetris</h1>
+    <div class="flex justify-between text-yellow-400 text-sm pixel-font px-2 mb-2">
+      <span id="score">Score: 0</span>
+      <span id="level">Level: 1</span>
+    </div>
+    <div id="lines" class="text-yellow-400 text-sm pixel-font px-2 mb-4">Lines: 0</div>
+
+    <!-- Tetris Grid -->
+    <div id="grid" class="grid-container mx-auto mb-6"></div>
+
+    <!-- Controls -->
+    <div class="flex justify-center gap-2 mb-4">
+      <button onclick="playerMove(-1)" class="bg-blue-500 text-white px-4 py-2 rounded pixel-font">&lt;</button>
+      <button onclick="playerRotate()" class="bg-blue-500 text-white px-4 py-2 rounded pixel-font">ROTATE</button>
+      <button onclick="playerMove(1)" class="bg-blue-500 text-white px-4 py-2 rounded pixel-font">&gt;</button>
+    </div>
+
+    <button id="startBtn" onclick="startGame()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded pixel-font mb-2">START GAME</button>
+    <a href="index.html">
+      <button class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded pixel-font">KEMBALI</button>
+    </a>
+  </div>
+
+  <!-- Game Over Popup -->
+  <div id="gameOverOverlay" class="popup-overlay"></div>
+  <div id="gameOverPopup" class="popup">
+    <p>GAME OVER</p>
+    <button onclick="showRomantisPopup()">OK</button>
+  </div>
+
+  <!-- Romantis Popup -->
+  <div id="romantisOverlay" class="popup-overlay"></div>
+  <div id="romantisPopup" class="popup">
+    <p>INGET YA!<br><br>walaupun kamu kalah,<br><br>tapi kamu selalu menang<br>kok di hati aku, HEHE ^_^<br><br>BYE MANTAN</p>
+    <button onclick="location.reload()">OK</button>
+  </div>
+
+  <script>
+    // Setup grid cells
+    const grid = document.getElementById('grid');
+    for (let i = 0; i < 10 * 20; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      grid.appendChild(cell);
+    }
+
+    const cells = [...grid.children];
+    const width = 10, height = 20;
+
+    const colors = [null, '#00f0f0', '#0000f0', '#a000f0', '#f0a000', '#f0f000', '#00f000', '#f00000'];
+
+    function createMatrix(w, h) {
+      return Array.from({ length: h }, () => Array(w).fill(0));
+    }
+
+    function drawMatrix(matrix, offset) {
+      matrix.forEach((row, y) => {
+        row.forEach((val, x) => {
+          const idx = (y + offset.y) * width + (x + offset.x);
+          if (val && idx >= 0 && idx < cells.length) {
+            cells[idx].style.background = colors[val];
+          }
+        });
+      });
+    }
+
+    function clearGrid() {
+      cells.forEach(cell => cell.style.background = '#111827');
+    }
+
+    function merge(arena, player) {
+      player.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            arena[y + player.pos.y][x + player.pos.x] = value;
+          }
+        });
+      });
+    }
+
+    function collide(arena, player) {
+      const m = player.matrix;
+      const o = player.pos;
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < m[y].length; ++x) {
+          if (m[y][x] && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function createPiece(type) {
+      if (type === 'T') return [[0,1,0],[1,1,1],[0,0,0]];
+      if (type === 'O') return [[2,2],[2,2]];
+      if (type === 'L') return [[0,0,3],[3,3,3],[0,0,0]];
+      if (type === 'J') return [[4,0,0],[4,4,4],[0,0,0]];
+      if (type === 'I') return [[0,5,0,0],[0,5,0,0],[0,5,0,0],[0,5,0,0]];
+      if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+      if (type === 'Z') return [[7,7,0],[0,7,7],[0,0,0]];
+    }
+
+    let arena = createMatrix(width, height);
+    const player = { pos: {x: 0, y: 0}, matrix: null };
+
+    let dropCounter = 0;
+    let dropInterval = 300; // lebih cepat
+    let lastTime = 0;
+    let score = 0;
+    let lines = 0;
+    let frameId;
+
+    function playerReset() {
+      const pieces = 'TJLOSZI';
+      player.matrix = createPiece(pieces[Math.floor(Math.random() * pieces.length)]);
+      player.pos.y = 0;
+      player.pos.x = (width / 2 | 0) - (player.matrix[0].length / 2 | 0);
+      if (collide(arena, player)) {
+        // game over
+        cancelAnimationFrame(frameId);
+        showGameOverPopup();
+      }
+    }
+
+    function playerMove(dir) {
+      player.pos.x += dir;
+      if (collide(arena, player)) player.pos.x -= dir;
+    }
+
+    function playerRotate() {
+      const m = player.matrix;
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < y; ++x) {
+          [m[x][y], m[y][x]] = [m[y][x], m[x][y]];
+        }
+      }
+      m.forEach(row => row.reverse());
+      if (collide(arena, player)) {
+        m.forEach(row => row.reverse());
+        m.reverse();
+      }
+    }
+
+    function playerDrop() {
+      player.pos.y++;
+      if (collide(arena, player)) {
+        player.pos.y--;
+        merge(arena, player);
+        arenaSweep();
+        updateScore();
+        playerReset();
+      }
+      dropCounter = 0;
+    }
+
+    function arenaSweep() {
+      let rowCount = 1;
+      for (let y = arena.length - 1; y >= 0; --y) {
+        if (arena[y].every(val => val !== 0)) {
+          arena.splice(y, 1);
+          arena.unshift(Array(width).fill(0));
+          lines++;
+          score += rowCount * 10;
+          rowCount *= 2;
+        }
+      }
+    }
+
+    function updateScore() {
+      document.getElementById('score').innerText = 'Score: ' + score;
+      document.getElementById('lines').innerText = 'Lines: ' + lines;
+      document.getElementById('level').innerText = 'Level: ' + (Math.floor(lines / 10) + 1);
+    }
+
+    function draw() {
+      clearGrid();
+      drawMatrix(arena, {x:0, y:0});
+      drawMatrix(player.matrix, player.pos);
+    }
+
+    function update(time = 0) {
+      const deltaTime = time - lastTime;
+      lastTime = time;
+      dropCounter += deltaTime;
+      if (dropCounter > dropInterval) {
+        playerDrop();
+      }
+      draw();
+      frameId = requestAnimationFrame(update);
+    }
+
+    function startGame() {
+      arena = createMatrix(width, height);
+      score = 0;
+      lines = 0;
+      updateScore();
+      playerReset();
+      dropInterval = 300;
+      lastTime = 0;
+      dropCounter = 0;
+      draw();
+      document.getElementById('startBtn').style.display = 'none';
+      update();
+    }
+
+    // Popup functions
+    function showGameOverPopup() {
+      document.getElementById('gameOverOverlay').style.display = 'block';
+      document.getElementById('gameOverPopup').style.display = 'block';
+    }
+    function hideGameOverPopup() {
+      document.getElementById('gameOverOverlay').style.display = 'none';
+document.getElementById('gameOverPopup').style.display = 'none';
+}
+function showRomantisPopup() {
+hideGameOverPopup();
+document.getElementById('romantisOverlay').style.display = 'block';
+document.getElementById('romantisPopup').style.display = 'block';
+}
+</script>
+
+</body> </html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    .pixel-font {
+      font-family: 'Press Start 2P', cursive;
+    }
+    .screen {
+      background:
+        radial-gradient(circle, rgba(27, 103, 27, 0.371) 1px, transparent 1px),
+        #093c1a;
+      background-size: 4px 4px;
+      background-position: 0 0;
+      background-repeat: repeat;
+      background-blend-mode: overlay;
+    }
+    @keyframes scanDown {
+      0% { top: 0; opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .scan-bar {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      background: rgba(255, 255, 0, 0.4);
+      animation: scanDown 4s ease-out forwards;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="bg-[#f987c5] from-[#5f00ba] to-[#090979] min-h-screen flex items-center justify-center px-4 py-6">
+
+  <div class="max-w-md w-full p-3 border-4 border-yellow-400 rounded-xl bg-[#0f172a] relative">
+    <div class="screen p-4 rounded-lg">
+      <h1 class="text-green-400 pixel-font text-2xl text-center mb-2">Gallery</h1>
+
+      <div class="bg-gray-700 rounded-t-md px-6 py-4 flex items-center justify-between text-yellow-400 font-bold text-xs">
+        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+        PITOU PHOTOBOX
+        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+      </div>
+
+      <div class="bg-gray-600 h-10 my-2 mx-auto w-full flex items-center justify-center">
+        <div class="h-2 w-3/4 bg-black rounded-sm"></div>
+      </div>
+
+      <!-- Display Area -->
+      <div class="bg-[#0f172a] text-gray-400 min-h-[400px] rounded-md flex flex-col items-center justify-center p-4 overflow-hidden relative">
+        <div id="introContent" class="flex flex-col items-center justify-center gap-2">
+          <p id="photoboxText" class="text-center">Photobox siap digunakan</p>
+          <button id="startBtn" class="bg-yellow-400 text-black px-4 py-2 rounded font-bold">Mulai Cetak Foto</button>
+        </div>
+        <p id="loadingText" class="pixel-font text-yellow-400 hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+          Mempersiapkan photobox....
+        </p>
+        <div id="mediaOutput" class="p-4 flex flex-col gap-4 opacity-0 pointer-events-none transition-opacity duration-700 text-yellow-400 text-xs text-center pixel-font w-full"></div>
+      </div>
+
+      <div class="bg-gray-700 h-10 mt-2 flex items-center justify-around rounded-b-md">
+        <div class="bg-gray-800 h-4 w-12 rounded-full"></div>
+        <div class="bg-gray-800 h-4 w-12 rounded-full"></div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-6">
+      <a href="music.html">
+        <button class="w-full bg-green-500 hover:bg-green-600 text-white text-base py-3 rounded pixel-font">SELANJUTNYA</button>
+      </a>
+      <a href="index.html">
+        <button class="w-full bg-red-500 hover:bg-red-600 text-white text-base py-3 rounded pixel-font">KEMBALI</button>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const mediaOutput = document.getElementById('mediaOutput');
+    const introContent = document.getElementById('introContent');
+    const loadingText = document.getElementById('loadingText');
+
+    const mediaItems = [
+      { src: '/img/foto1.jpeg', label: '#1', type: 'image' },
+      { src: '/img/foto2.jpeg', label: '#2', type: 'image' },
+      { src: '/img/foto3.jpeg', label: '#3', type: 'image' },
+      { src: '/img/video.mp4', label: '#4', type: 'video' },
+    ];
+
+    startBtn.addEventListener('click', async () => {
+      // Sembunyikan intro dan tampilkan loading
+      introContent.style.display = 'none';
+      loadingText.classList.remove('hidden');
+
+      // Tunggu 2 detik sebelum mulai menampilkan media
+      setTimeout(async () => {
+        loadingText.classList.add('hidden');
+        mediaOutput.classList.remove('opacity-0', 'pointer-events-none');
+
+        for (let i = 0; i < mediaItems.length; i++) {
+          const item = mediaItems[i];
+
+          const card = document.createElement('div');
+          card.className = 'bg-[#ffffff] p-3 rounded-xl shadow-xl flex justify-center';
+
+          card.innerHTML = `
+            <div class="bg-white rounded-xl overflow-hidden w-[300px]">
+              <div class="relative bg-black flex justify-center items-center h-[300px] overflow-hidden">
+                <div class="absolute inset-0 bg-black flex justify-center items-center text-yellow-400 font-bold pixel-font text-sm flex-col gap-1 z-20" id="placeholder-${i}">
+                  <div>Mencetak Foto ${i + 1} dari ${mediaItems.length}</div>
+                  <div id="progress-${i}">(1%)</div>
+                </div>
+                <div class="absolute inset-0 scan-bar"></div>
+                <div class="absolute bottom-0 w-full text-center text-yellow-400 font-bold pixel-font text-lg py-1" style="background-color: rgba(0, 0, 0, 0.5); z-index: 20;">
+                  ${item.label}
+                </div>
+              </div>
+              <div class="flex justify-between items-center px-4 py-2">
+                <div class="w-2 h-2 rounded-full bg-black"></div>
+                <div class="bg-yellow-400 text-black text-sm font-bold pixel-font px-2 py-1 rounded">
+                  17/10/25
+                </div>
+
+                <div class="w-2 h-2 rounded-full bg-black"></div>
+              </div>
+            </div>
+          `;
+          mediaOutput.appendChild(card);
+
+          // Jalankan animasi angka 1–100
+          let percent = 1;
+          const progressEl = document.getElementById(`progress-${i}`);
+          const progressInterval = setInterval(() => {
+            percent++;
+            if (percent > 100) {
+              clearInterval(progressInterval);
+            } else {
+              progressEl.innerText = `(${percent}%)`;
+            }
+          }, 40); // 4 detik total
+
+          // Tampilkan foto setelah scan selesai (4 detik)
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          const placeholder = document.getElementById(`placeholder-${i}`);
+          if (item.type === 'video') {
+            placeholder.innerHTML = `
+              <video id="video-${i}" src="${item.src}" class="object-cover w-auto h-full" autoplay loop></video>
+            `;
+            const vid = document.getElementById(`video-${i}`);
+            vid.volume = 1.0;
+            vid.play().catch(err => console.log('Autoplay diblokir:', err));
+          } else {
+            placeholder.innerHTML = `
+              <img src="${item.src}" class="object-cover w-auto h-full" alt="Foto"/>
+            `;
+          }
+
+
+          // Tunggu 3 detik sebelum lanjut ke foto berikutnya
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+      }, 2000); // Tunggu 2 detik untuk "Mempersiapkan photobox..."
+    });
+  </script>
+</body>
+</html>

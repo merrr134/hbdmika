@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Music Player</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    .pixel-font {
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    .screen {
+      background:
+        radial-gradient(circle, rgba(27, 103, 27, 0.371) 1px, transparent 1px),
+        #093c1a;
+      background-image:
+        radial-gradient(circle, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+      background-size: 4px 4px;
+      background-repeat: repeat;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scrollbar-hidden {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Animasi rotasi */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* class untuk lingkaran kecil yang akan berputar */
+    .rotate-circles {
+      animation: spin 3s linear infinite;
+      transform-origin: center center;
+    }
+  </style>
+</head>
+<body class="bg-purple-500 min-h-screen flex items-center justify-center px-4 py-10">
+  <div class="max-w-md w-full p-4 border-4 border-yellow-400 rounded-xl bg-[#0f172a]">
+    <div class="screen p-4 rounded-lg text-green-400 pixel-font text-xs leading-relaxed">
+      <h1 class="text-green-500 text-2xl text-center mb-1">Music Player</h1>
+
+      <!-- Thumbnail -->
+      <div class="bg-[#1e293b] rounded-lg overflow-hidden p-2 mb-4">
+        <img id="album-art" src="img/foto1.jpg" alt="Album Art" class="w-full rounded mb-4" />
+        <div id="song-title" class="text-center text-green-400 text-base">On Bended Knee</div>
+        <div id="song-artist" class="text-center text-yellow-400 text-xs mb-3">Boyz II Men</div>
+        <div class="w-full h-2 bg-gray-700 rounded overflow-hidden mb-1">
+          <div id="progress-bar" class="bg-yellow-400 h-full w-[0%]"></div>
+        </div>
+        <div class="flex justify-between text-white text-[10px]">
+          <span id="current-time">0:00</span>
+          <span id="duration">0:00</span>
+        </div>
+      </div>
+
+      <!-- Panel + Buttons -->
+      <div id="panel" class="w-full bg-[#2a3141] rounded-lg px-4 py-4 flex items-center justify-between border border-[#4a5261]" style="box-shadow: 0 0 0 1px #4a5261;">
+        <!-- Lingkaran kecil 1 -->
+        <div id="circle1" class="w-12 h-12 rounded-full border-4 border-[#4a5261] flex items-center justify-center relative">
+          <div class="absolute w-full h-0.5 bg-[#4a5261]"></div>
+        </div>
+        <!-- Lingkaran kecil 2 -->
+        <div id="circle2" class="w-16 h-16 rounded-full border-4 border-[#4a5261] flex items-center justify-center relative">
+          <div class="w-6 h-6 bg-[#4a5261] rounded-full z-10"></div>
+          <div class="absolute w-0.5 h-full bg-[#4a5261]"></div>
+        </div>
+        <!-- Lingkaran kecil 3 -->
+        <div id="circle3" class="w-12 h-12 rounded-full border-4 border-[#4a5261] flex items-center justify-center relative">
+          <div class="absolute w-full h-0.5 bg-[#4a5261]"></div>
+        </div>
+      </div>
+
+      <div class="w-full flex justify-between mt-4">
+        <button id="prevBtn" class="bg-blue-600 px-6 py-2 text-white rounded-lg pixel-font">&lt;&lt;</button>
+        <button id="playBtn" class="bg-blue-500 px-6 py-2 text-white rounded-lg pixel-font">▶</button>
+        <button id="nextBtn" class="bg-blue-600 px-6 py-2 text-white rounded-lg pixel-font">&gt;&gt;</button>
+      </div>
+
+      <!-- Volume slider dengan ikon speaker di kiri -->
+      <div id="volume-slider" class="flex items-center gap-2 bg-[#2a3141] rounded-lg px-3 py-2 w-full shadow-lg mt-4 mb-2">
+        <!-- Icon speaker (hanya dekorasi) -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-6 h-6 text-green-400 flex-shrink-0">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.54 8.46a5 5 0 010 7.07" />
+        </svg>
+        <input type="range" min="0" max="100" value="70" class="flex-grow h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-green-400" />
+      </div>
+
+
+      <!-- Playlist -->
+      <div class="bg-[#1e293b] rounded-lg p-3 max-h-[200px] overflow-y-auto scrollbar-hidden">
+        <div class="text-yellow-400 mb-2 text-sm">PLAYLIST:</div>
+        <ul id="playlist" class="text-white text-xs space-y-1">
+          <li onclick="selectSong(0)" class="cursor-pointer text-green-400 flex justify-between text-sm" style="font-family: sans-serif;"><span>1. On Bended Knee</span><span class="text-gray-400">05:31</span></li>
+          <li onclick="selectSong(1)" class="cursor-pointer flex justify-between text-sm" style="font-family: sans-serif;"><span>2. About You</span><span class="text-gray-400">05:26</span></li>
+          <li onclick="selectSong(2)" class="cursor-pointer flex justify-between text-sm" style="font-family: sans-serif;"><span>3. Multo</span><span class="text-gray-400">03:57</span></li>
+          <li onclick="selectSong(3)" class="cursor-pointer flex justify-between text-sm" style="font-family: sans-serif;"><span>4. Jadi Kekasihku Saja </span><span class="text-gray-400">02:50</span></li>
+          <li onclick="selectSong(4)" class="cursor-pointer flex justify-between text-sm" style="font-family: sans-serif;"><span>5. Ucapan Hbd Dari Amir</span><span class="text-gray-400">00:47</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex flex-col gap-4 mt-6">
+      <a href="tetris.html">
+        <button class="w-full bg-green-500 hover:bg-green-600 text-white text-base py-3 rounded pixel-font">SELANJUTNYA</button>
+      </a>
+      <a href="index.html">
+        <button class="w-full bg-red-500 hover:bg-red-600 text-white text-base py-3 rounded pixel-font">KEMBALI</button>
+      </a>
+    </div>
+  </div>
+
+  <audio id="audio-player" controls hidden></audio>
+
+  <script>
+    const songs = [
+      { title: "On Bended Knee", artist: "Boyz II Men", file: "music/On Bended Knee - Boyz II Men.mp3", image: "img/Knee by Boyz II Men.jpg" },
+      { title: "About You", artist: "The 1975", file: "music/About You - The 1975.mp3", image: "img/About You by The 1975.jpg" },
+      { title: "Multo", artist: "Multo", file: "music/Multo - Cup of Joe.mp3", image: "img/Multo by Cup of Joe.jpg" },
+      { title: "Jadi kekasihku Saja", artist: "Keisya Levronka", file: "music/Jadi Kekasihku Saja by Keisya Levronka.mp3", image: "img/Jadi Kekasihku Saja by Keisya Levronka.jpg" },
+      { title: "Ucapan hbd", artist: "Amir", file: "music/ucapan hbd.ogg", image: "img/foto2.jpeg" }
+    ];
+
+    const audioPlayer = document.getElementById('audio-player');
+    const playBtn = document.getElementById('playBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const circles = [
+      document.getElementById('circle1'),
+      document.getElementById('circle2'),
+      document.getElementById('circle3')
+    ];
+
+    const progressBar = document.getElementById('progress-bar');
+    const currentTimeElem = document.getElementById('current-time');
+    const durationElem = document.getElementById('duration');
+
+    let currentSongIndex = 0;
+    let isPlaying = false;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function updateUI() {
+      const playlist = document.getElementById('playlist').children;
+      for (let i = 0; i < playlist.length; i++) {
+        playlist[i].classList.remove('text-green-400');
+      }
+      playlist[currentSongIndex].classList.add('text-green-400');
+
+      document.getElementById('song-title').innerText = songs[currentSongIndex].title;
+      document.getElementById('song-artist').innerText = songs[currentSongIndex].artist;
+      document.getElementById('album-art').src = songs[currentSongIndex].image;
+      audioPlayer.src = songs[currentSongIndex].file;
+
+      // reset waktu dan progress
+      currentTimeElem.innerText = "0:00";
+      durationElem.innerText = "0:00";
+      progressBar.style.width = "0%";
+    }
+
+    function selectSong(index) {
+      currentSongIndex = index;
+      updateUI();
+      playAudio();
+    }
+
+    function playAudio() {
+      audioPlayer.play();
+      isPlaying = true;
+      playBtn.textContent = "⏸";
+      circles.forEach(c => c.classList.add('rotate-circles'));
+    }
+
+    function pauseAudio() {
+      audioPlayer.pause();
+      isPlaying = false;
+      playBtn.textContent = "▶";
+      circles.forEach(c => c.classList.remove('rotate-circles'));
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) pauseAudio();
+      else playAudio();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      currentSongIndex--;
+      if (currentSongIndex < 0) currentSongIndex = songs.length - 1;
+      updateUI();
+      playAudio();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentSongIndex++;
+      if (currentSongIndex >= songs.length) currentSongIndex = 0;
+      updateUI();
+      playAudio();
+    });
+
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (audioPlayer.duration) {
+        const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progressBar.style.width = progressPercent + '%';
+        currentTimeElem.innerText = formatTime(audioPlayer.currentTime);
+        durationElem.innerText = formatTime(audioPlayer.duration);
+      }
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      nextBtn.click();
+    });
+
+    // Volume slider logic
+    const volumeSlider = document.querySelector('#volume-slider input[type=range]');
+    audioPlayer.volume = 0.7;
+    volumeSlider.value = 70;
+
+    volumeSlider.addEventListener('input', (e) => {
+      audioPlayer.volume = e.target.value / 100;
+    });
+
+    // Initialize UI
+    updateUI();
+  </script>
+</body>
+</html>
